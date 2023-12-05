@@ -1,4 +1,5 @@
 <%@ page import="com.common.JDBConnect" %>
+<%@ page import="com.common.DBConnPool" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <html>
 <head>
@@ -27,11 +28,16 @@
 
 <%--        jdbc2.close();--%>
 <%--    %>--%>
-    <h2>JDBC 연결 테스트 03</h2>
-    <%
-        JDBConnect jdbc3 = new JDBConnect(application);
+<%--    <h2>JDBC 연결 테스트 03</h2>--%>
+<%--    <%--%>
+<%--        JDBConnect jdbc3 = new JDBConnect(application);--%>
 
-        jdbc3.close();
+<%--        jdbc3.close();--%>
+<%--    %>--%>
+    <h2>커넥션 풀 연결 테스트 01</h2>
+    <%
+        DBConnPool pool = new DBConnPool();
+        pool.close();
     %>
 </body>
 </html>

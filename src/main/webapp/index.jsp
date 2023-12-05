@@ -39,6 +39,7 @@
 <h1>처음만들어보는 <%= str1 %>
 </h1>
 <p>
+    <jsp:include page="/common/Link.jsp"></jsp:include>
     <%
         out.println(str2 + str1 + "입니다.");
 
