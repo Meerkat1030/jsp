@@ -93,4 +93,137 @@ public class BoardDAO extends DBConnPool {
 
         return result;
     }
+
+    // 게시글 작성
+    public BoardDTO selectView(String num){
+        BoardDTO dto = new BoardDTO();
+
+        // 쿼리 작성
+        String query = "SELECT B.*, M.name "
+                + " FROM board B INNER JOIN member M"
+                + " ON M.id = B.id "
+                + " WHERE num = ?";
+
+        try{
+            psmt = con.prepareStatement(query);
+            psmt.setString(1, num);
+            rs = psmt.executeQuery();
+
+            if(rs.next()){
+                dto.setNum(rs.getString("num"));
+                dto.setTitle(rs.getString("title"));
+                dto.setContent(rs.getString("content"));
+                dto.setId(rs.getString("id"));
+                dto.setName(rs.getString("name"));
+                dto.setVisitcount(rs.getString("visitcount"));
+                dto.setPostdate(rs.getDate("postdate"));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("selectView 오류 발생");
+        }
+
+        return dto;
+    }
+
+    // 조회수 증가
+    public void updateViewCount(String num){
+        // 쿼리문 작성
+        String query = "UPDATE board SET "
+                + " visitcount = visitcount+1"
+                + " WHERE num = ?";
+
+        try{
+            psmt = con.prepareStatement(query);
+            psmt.setString(1, num);
+            rs = psmt.executeQuery();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("updateViewcount 오류 발생");
+        }
+    }
+
+    // 게시글 수정
+    public int updateEdit(BoardDTO dto){
+        int result = 0;
+
+        String query = "UPDATE board SET "
+                + " title=? , content=?"
+                + " WHERE num = ?";
+
+        try{
+            psmt = con.prepareStatement(query);
+            psmt.setString(1, dto.getTitle());
+            psmt.setString(2, dto.getContent());
+            psmt.setString(3, dto.getNum());
+
+            result = psmt.executeUpdate();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("updateEdit 오류 발생");
+        }
+        return result;
+    }
+
+    public int deletePost(BoardDTO dto){
+        int result = 0;
+
+        try{
+            String query = "DELETE FROM board WHERE num=?";
+
+            psmt = con.prepareStatement(query);
+            psmt.setString(1, dto.getNum());
+
+            result = psmt.executeUpdate();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("deletePost 오류 발생");
+        }
+
+        return result;
+    }
+
+    public List<BoardDTO> selectListPage(Map<String,Object>map){
+        List<BoardDTO> bbs = new ArrayList<BoardDTO>();
+
+        String query = " SELECT * FROM ("
+                + " SELECT Tb.*, ROWNUM rNUM FROM ("
+                + " SELECT * FROM board";
+
+        if(map.get("searchWord") != null){
+            query += " WHERE " + map.get("searchFiled") + " "
+                    +" LIKE '%" + map.get("searchWord") + "%'";
+        }
+        query += " ORDER BY num DESC"
+                + " ) Tb"
+                + " )"
+                + " WHERE rNUM BETWEEN ? AND ? ";
+
+        try{
+            psmt = con.prepareStatement(query);
+            psmt.setString(1, map.get("start").toString());
+            psmt.setString(2, map.get("end").toString());
+            rs = psmt.executeQuery();
+
+            while(rs.next()){
+                // 게시물 하나의 내용을 저장
+                BoardDTO dto = new BoardDTO();
+
+                dto.setNum(rs.getString("num"));
+                dto.setTitle(rs.getString("title"));
+                dto.setContent(rs.getString("content"));
+                dto.setId(rs.getString("id"));
+                dto.setPostdate(rs.getDate("postdate"));
+                dto.setVisitcount(rs.getString("visitcount"));
+
+                bbs.add(dto);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("selectList 오류 발생");
+        }
+
+        return bbs;
+    }
 }

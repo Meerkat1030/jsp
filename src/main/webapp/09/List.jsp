@@ -3,6 +3,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.model1.BoardDTO" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.util.BoardPage" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <%
@@ -18,7 +19,27 @@
         param.put("searchWord", searchWord);
     }
     int totalCount = dao.selectCount(param); // 게시물 수 확인
-    List<BoardDTO> boardList = dao.selectList(param); // 게시물 목록
+
+    /* 페이징 처리 start */
+    // 전체 페이지 수 계산
+    int pageSize = Integer.parseInt(application.getInitParameter("POSTS_PER_PAGE"));
+    int blockPage = Integer.parseInt(application.getInitParameter("POSTS_PER_BLOCK"));
+    int totalPage = (int)Math.ceil((double) totalCount/pageSize);
+
+    // 현재 페이지 확인
+    int pageNum = 1;
+    String pageTemp = request.getParameter("pageNum");
+    if(pageTemp != null && !pageTemp.equals("")){
+        pageNum = Integer.parseInt(pageTemp); // 페이지 요청 받은 값
+    }
+
+    // 목록에 출력할 게시물 범위 계산
+    int start = (pageNum -1) * pageSize + 1;
+    int end = pageNum * pageSize;
+    param.put("start", start);
+    param.put("end", end);
+
+    List<BoardDTO> boardList = dao.selectListPage(param); // 게시물 목록
     dao.close();
 %>
 
@@ -30,7 +51,7 @@
 </head>
 <body>
     <jsp:include page="../common/Link.jsp"></jsp:include>
-    <h2>목록 보기</h2>
+    <h2>목록 보기 - 현재 페이지 : <%=pageNum%>(전체 : <%=totalPage%>)</h2>
     <form method="get">
         <table border="1" width="90%">
             <tr>
@@ -67,14 +88,16 @@
         <%
             } else {
                 int virtualNum = 0; // 화면상에서의 게시물 번호
+                int countNum = 0;
                 for(BoardDTO dto : boardList){
-                    virtualNum = totalCount--;
+                    virtualNum = totalCount - (((pageNum-1)*pageSize)+countNum);
         %>
                     <tr align="center">
                         <td><%=virtualNum%></td> <%-- 게시물 번호 --%>
                         <td align="left"><a href="View.jsp?num=<%=dto.getNum()%>"><%=dto.getTitle()%></a></td> <%-- 제목 --%>
                         <td align="center"><%=dto.getId()%></td> <%-- 작성자 아이디 --%>
                         <td align="center"><%=dto.getVisitcount()%></td> <%-- 조회수 --%>
+                        <td align="center"><%=dto.getPostdate()%></td> <%-- 작성일 --%>
                         <td align="center"><%=dto.getPostdate()%></td> <%-- 작성일 --%>
                     </tr>
         <%
@@ -83,7 +106,10 @@
         %>
     </table>
     <table border="1" width="90%">
-        <tr align="right">
+        <tr align="center">
+            <td>
+                <%= BoardPage.pagingStr(totalCount, pageSize, blockPage, pageNum, request.getRequestURI())%>
+            </td>
             <td>
                 <button type="button" onclick="location.href='Write.jsp'">글쓰기</button>
             </td>
