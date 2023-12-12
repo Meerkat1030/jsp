@@ -1,6 +1,6 @@
 package com.model1;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class BoardDTO {
     private String num;
@@ -66,5 +66,4 @@ public class BoardDTO {
     public void setName(String name) {
         this.name = name;
     }
-
 }

@@ -4,15 +4,18 @@ import javax.servlet.jsp.JspWriter;
 import java.io.IOException;
 
 public class JSFunction {
+
+
     public static void alertLocation(String msg, String url, JspWriter out){
-        try{
+        try {
             String script = ""
                     + "<script>"
-                    + " alert('"+msg+"');"
-                    + " location.href ='"+url+"';"
-                    + "</script>";
+                    +"  alert('"+msg + "');"
+                    +"  location.href ='" +url + "';"
+                    +"</script>";
             out.print(script);
-        }catch (IOException e){
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -20,11 +23,13 @@ public class JSFunction {
         try{
             String script = ""
                     + "<script>"
-                    + " alert('"+msg+"');"
-                    + " history.back();"
-                    + "</script>";
+                    +"  alert('"+msg + "');"
+                    +"  history.back();"
+                    +"</script>";
             out.print(script);
         }catch (Exception e){
+
         }
     }
+
 }

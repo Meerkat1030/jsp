@@ -3,11 +3,12 @@ package com.common;
 public class Person {
     private String name;
     private int age;
-    public Person(){} // 기본 생성자
-    public Person(String name, int age) {
+
+    public Person(){} //기본생성자
+    public Person(String name, int age){
         super();
-        this.name = name;
         this.age = age;
+        this.name = name;
     }
 
     public String getName() {
